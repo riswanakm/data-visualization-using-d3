@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<head>
+  <!-- Load d3.js -->
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <link
+    rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+  />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style>
+    .centerIt {
+      width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container"><div class="centerIt">
+    <h1>Lollipop chart</h1>
+    <p>This graph showcases the number of animals of a specific breed in the zoo</p>
+    <button
+      class="btn btn-success"
+      onclick="zoo1('Number_Of_Animal_Species_In_Class')"
+    >
+      American Zoo
+    </button>
+    <button
+      class="btn btn-success"
+      onclick="zoo2('Number_Of_Animal_Species_In_Class')"
+    >
+      Canadian Zoo
+    </button>
+    <div id="my_data"></div>
+  </div>
+  </div>
+
+  <!-- Create a div where the graph will take place -->
+
+</body>
+<script>
+  function goBack() {
+    window.location.href = "/D3";
+  }
+  // set the dimensions and margins of the graph
+  var margin = { top: 30, right: 30, bottom: 70, left: 60 },
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+  // append the svg object to the body of the page
+  var svg = d3
+    .select("#my_data")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // Initialize the X axis
+  var x = d3.scaleBand().range([0, width]).padding(1);
+  var xAxis = svg.append("g").attr("transform", "translate(0," + height + ")");
+  // X Axis Label
+  svg
+    .append("text")
+    .attr(
+      "transform",
+      "translate(" + width / 2 + " ," + (height + margin.top +5) + ")"
+    )
+    .style("text-anchor", "middle")
+    .text("Animal Species in Zoo");
+
+  // Initialize the Y axis
+  var y = d3.scaleLinear().range([height, 0]);
+  var yAxis = svg.append("g").attr("class", "myYaxis");
+  // Y Axis Label
+  svg
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - height / 2)
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Count");
+  // A function that create / update the plot for a given variable:
+  function zoo1(selectedVar) {
+    // Parse the Data
+    d3.csv("./zoo1.csv", function (data) {
+      // X axis
+      x.domain(
+        data.map(function (d) {
+          return d.Class_Type;
+        })
+      );
+      xAxis.transition().duration(1000).call(d3.axisBottom(x));
+
+      // Add Y axis
+      y.domain([
+        0,
+        d3.max(data, function (d) {
+          return +d[selectedVar];
+        }),
+      ]);
+      yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+      // variable u: map data to existing circle
+      var j = svg.selectAll(".myLine").data(data);
+      // update lines
+      j.enter()
+        .append("line")
+        .attr("class", "myLine")
+        .merge(j)
+        .transition()
+        .duration(1000)
+        .attr("x1", function (d) {
+          console.log(x(d.Class_Type));
+          return x(d.Class_Type);
+        })
+        .attr("x2", function (d) {
+          return x(d.Class_Type);
+        })
+        .attr("y1", y(0))
+        .attr("y2", function (d) {
+          return y(d[selectedVar]);
+        })
+        .attr("stroke", "grey");
+
+      // variable u: map data to existing circle
+      var u = svg.selectAll("circle").data(data);
+      // update bars
+      u.enter()
+        .append("circle")
+        .merge(u)
+        .transition()
+        .duration(1000)
+        .attr("cx", function (d) {
+          return x(d.Class_Type);
+        })
+        .attr("cy", function (d) {
+          return y(d[selectedVar]);
+        })
+        .attr("r", 8)
+        .attr("fill", "#7ab369");
+    });
+  }
+
+  function zoo2(selectedVar) {
+    // Parse the Data
+    d3.csv("./zoo2.csv", function (data) {
+      // X axis
+      x.domain(
+        data.map(function (d) {
+          return d.Class_Type;
+        })
+      );
+      xAxis.transition().duration(1000).call(d3.axisBottom(x));
+
+      // Add Y axis
+      y.domain([
+        0,
+        d3.max(data, function (d) {
+          return +d[selectedVar];
+        }),
+      ]);
+      yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+      // variable u: map data to existing circle
+      var j = svg.selectAll(".myLine").data(data);
+      // update lines
+      j.enter()
+        .append("line")
+        .attr("class", "myLine")
+        .merge(j)
+        .transition()
+        .duration(1000)
+        .attr("x1", function (d) {
+          console.log(x(d.Class_Type));
+          return x(d.Class_Type);
+        })
+        .attr("x2", function (d) {
+          return x(d.Class_Type);
+        })
+        .attr("y1", y(0))
+        .attr("y2", function (d) {
+          return y(d[selectedVar]);
+        })
+        .attr("stroke", "grey");
+
+      // variable u: map data to existing circle
+      var u = svg.selectAll("circle").data(data);
+      // update bars
+      u.enter()
+        .append("circle")
+        .merge(u)
+        .transition()
+        .duration(1000)
+        .attr("cx", function (d) {
+          return x(d.Class_Type);
+        })
+        .attr("cy", function (d) {
+          return y(d[selectedVar]);
+        })
+        .attr("r", 8)
+        .attr("fill", "#7ab369");
+    });
+  }
+
+  // Initialize plot
+  zoo1("Number_Of_Animal_Species_In_Class");
+</script>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<head>
+  <!-- Load d3.js -->
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <style>
+    .centerIt {
+      width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Create a div where the graph will take place -->
+  <div class="container">
+    <div class="centerIt">
+      <h1>Pie chart</h1>
+      <p>This chart shows the number of species available in the American Zoo</p>
+      <div id="my_data"></div>
+    </div>
+  </div>
+</body>
+<!-- Color scale -->
+<script>
+  function goBack() {
+    window.location.href = "/D3";
+  }
+
+  // set the dimensions and margins of the graph
+  var width = 450;
+  height = 450;
+  margin = 40;
+
+  // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+  var radius = Math.min(width, height) / 2 - margin;
+
+  // append the svg object to the div called 'my_data'
+  var svg = d3
+    .select("#my_data")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+  d3.csv("./class.csv", function (data) {
+    // Format the data
+    data.forEach(function (d) {
+      d.Number_Of_Animal_Species_In_Class =
+        +d.Number_Of_Animal_Species_In_Class;
+    });
+
+    // Set the color scale
+    var color = d3
+      .scaleOrdinal()
+      .domain(
+        data.map(function (d) {
+          return d.Class_Type;
+        })
+      )
+      .range(d3.schemePaired);
+
+    // Compute the position of each group on the pie
+    var pie = d3.pie().value(function (d) {
+      return d.Number_Of_Animal_Species_In_Class;
+    });
+    var data_ready = pie(data);
+
+    // Build the pie chart
+    var arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
+
+    svg
+      .selectAll("mySlices")
+      .data(data_ready)
+      .enter()
+      .append("path")
+      .attr("d", arcGenerator)
+      .attr("fill", function (d) {
+        return color(d.data.Class_Type);
+      })
+      .attr("stroke", "black")
+      .style("stroke-width", "2px")
+      .style("opacity", 0.7);
+
+    // Add the annotation to each slice
+    svg
+      .selectAll("mySlices")
+      .data(data_ready)
+      .enter()
+      .append("text")
+      .text(function (d) {
+        return d.data.Class_Type+" "+d.data.Number_Of_Animal_Species_In_Class;
+      })
+      .attr("transform", function (d) {
+        return "translate(" + arcGenerator.centroid(d) + ")";
+      })
+      .style("text-anchor", "middle")
+      .style("font-size", 17);
+    // Define the initial and final angles for the rotation
+    const startAngle = 0;
+    const endAngle = 360;
+
+    
+  });
+</script>
